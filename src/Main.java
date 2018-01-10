@@ -8,86 +8,95 @@ public class Main {
 
     public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
 
-        String klartext = "Dies ist ein Test.";
         int blockLaenge = 16;
+        String klartext = Helper.getPlaintext(args);
+        System.out.println("\nVerwendeter Klartext: " + klartext);
+
 
         if (klartext.length() % blockLaenge != 0) {
             klartext = klartext + "\u0001";
         }
 
-        byte[] bytes = klartext.getBytes("UTF-8");
+        char[] chars = klartext.toCharArray();
 
-        LinkedList<byte[]> bytebloecke = new LinkedList<>(); //LinkedList, um Reihenfolge beizubehalten
+        LinkedList<char[]> charbloecke = new LinkedList<>(); //LinkedList, um Reihenfolge beizubehalten
         int anfang = 0;
         while (anfang < klartext.length()) {
             int ende = anfang + blockLaenge;
 
-            byte[] block = Arrays.copyOfRange(bytes, anfang, ende);
-            bytebloecke.add(block);
+            char[] block = Arrays.copyOfRange(chars, anfang, ende);
+            charbloecke.add(block);
 
             anfang = ende;
         }
 
-        byte textregister[] = MessageDigest.getInstance("SHA-256").digest();
+        System.out.println("\nKlartextblöcke: ");
+        for (char[] block : charbloecke)
+            Helper.prettyPrintCharArray(block);
 
+        char textregister[] = Helper.byteArraytoCharArray(MessageDigest.getInstance("SHA-256").digest());
 
-        for (byte[] block : bytebloecke) {
+        System.out.println("\nTextregister:");
+        for (char[] block : charbloecke) {
 
             // Letzter Teil des Textregisters 128Bit
             //block XOR Textregister
             //letzter Teil des Textregisters extrahieren
 
-            byte[] niederwertigeBytes = Arrays.copyOfRange(textregister, 16, 32);
+
+            char[] niederwertigeBytes = Arrays.copyOfRange(textregister, 16, 32);
 
             //e.
             textregister = exor(niederwertigeBytes, block);
 
             //Mit Textregister wird ARC4 Initialisiert
+            RC4 rc4 = new RC4(textregister);
 
 
-            ARC4 arc4 = new ARC4();
+            // Man lässt die nächsten 256Bytes verfallen
+            for (int i = 0; i < 16; i++) {
+                rc4.berechneZufallsfolge(textregister);
+            }
+
+            char[] ergebnis1 = rc4.berechneZufallsfolge(textregister);
+            char[] ergebnis2 = rc4.berechneZufallsfolge(textregister);
+
+            textregister = new char[ergebnis1.length + ergebnis2.length];
+            System.arraycopy(ergebnis1, 0, textregister, 0, ergebnis1.length);
+            System.arraycopy(ergebnis2, 0, textregister, ergebnis2.length, ergebnis1.length);
 
 
-
-
-
+            Helper.prettyPrintCharArray(textregister);
         }
 
-        prettyPrintBytes(bytebloecke);
-        for (byte f : textregister)
-            System.out.print(f + ", ");
+        String ergebnis = "";
+
+        for (char f : textregister) {
+            ergebnis = ergebnis + Integer.toHexString((int) f);
+        }
+
+        System.out.println("\nErmittelter Hashwert:\n" + ergebnis);
+
 
     }
 
-    private static byte[] exor(byte[] byte1, byte[] byte2) {
+    private static char[] exor(char[] char1, char[] char2) {
 
-        byte[] byteArray = new byte[byte1.length];
+        char[] charArray = new char[char1.length];
 
-        for (int i = 0; i < byte1.length; i++) {
+        for (int i = 0; i < char1.length; i++) {
 
             // convert to ints and xor
-            int one = (int) byte1[i];
-            int two = (int) byte2[i];
+            int one = (int) char1[i];
+            int two = (int) char2[i];
             int xor = one ^ two;
-            // convert back to byte
-            byte b = (byte) (0xff & xor);
+            // convert back to char
+            char b = (char) (0xff & xor);
 
-            byteArray[i] = b;
+            charArray[i] = b;
         }
 
-        return byteArray;
-    }
-
-    private static void prettyPrintBytes(LinkedList<byte[]> bytebloecke) {
-        for (byte[] block : bytebloecke) {
-            String print = "[";
-            for (byte character : block)
-                print = print + character + ", ";
-            print = print.substring(0, print.length() - 2) + "]";
-            System.out.println(print);
-        }
+        return charArray;
     }
 
 }
-
-
