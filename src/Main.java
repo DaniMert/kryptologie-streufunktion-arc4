@@ -8,6 +8,7 @@ public class Main {
 
     public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
 
+        //(a. b.) Blocklaenge wird initialisiert mit der Länge 16. (128Bit 16*8Bit)
         int blockLength = 16;
         String plaintext = Helper.getPlaintext(args);
         System.out.println("\nVerwendter Klartext: " + plaintext);
