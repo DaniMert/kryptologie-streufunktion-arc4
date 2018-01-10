@@ -1,7 +1,8 @@
 /**
- * Created by danielmertens on 10.01.18.
+ * Erstellt von Taubert, Pham, Mertens am 10.01.18.
+ * Stellt RC4 Algorithmen zur Verfügung.
  */
-public class RC4 {
+class RC4 {
 
     private char sbox[] = new char[256];
 
@@ -13,12 +14,12 @@ public class RC4 {
 
         for (int i = 0; i < 256; i++) {
             j = (j + sbox[i] + textregister[i % textregister.length]) % 256;
-            vertauscheSboxWerte(i, j);
+            swapSboxValues(i, j);
         }
     }
 
-    public char[] berechneZufallsfolge (char textregister[]) {
-        char zufallsfolge[] = new char[textregister.length];
+    char[] calculate(char textregister[]) {
+        char randomResult[] = new char[textregister.length];
         int i = 0;
         int j = 0;
 
@@ -26,17 +27,17 @@ public class RC4 {
             i = (i + 1) % 256;
             j = (j + sbox[i]) % 256;
 
-            vertauscheSboxWerte(i,j);
+            swapSboxValues(i, j);
 
-            char zufallszahl = sbox[(sbox[i] + sbox[j]) % 256];
-            zufallsfolge[n] = (char) (zufallszahl^textregister[n]);
+            char randomValue = sbox[(sbox[i] + sbox[j]) % 256];
+            randomResult[n] = (char) (randomValue ^ textregister[n]);
 
         }
 
-        return zufallsfolge;
+        return randomResult;
     }
 
-    private void vertauscheSboxWerte(int i, int j) {
+    private void swapSboxValues(int i, int j) {
         char zs = sbox[i];
         sbox[i] = sbox[j];
         sbox[j] = zs;

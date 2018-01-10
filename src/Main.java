@@ -8,46 +8,46 @@ public class Main {
 
     public static void main(String[] args) throws UnsupportedEncodingException, NoSuchAlgorithmException {
 
-        int blockLaenge = 16;
-        String klartext = Helper.getPlaintext(args);
-        System.out.println("\nVerwendeter Klartext: " + klartext);
+        int blockLength = 16;
+        String plaintext = Helper.getPlaintext(args);
+        System.out.println("\nVerwendter Klartext: " + plaintext);
 
 
-        if (klartext.length() % blockLaenge != 0) {
-            klartext = klartext + "\u0001";
+        if (plaintext.length() % blockLength != 0) {
+            plaintext = plaintext + "\u0001";
         }
 
-        char[] chars = klartext.toCharArray();
+        char[] chars = plaintext.toCharArray();
 
-        LinkedList<char[]> charbloecke = new LinkedList<>(); //LinkedList, um Reihenfolge beizubehalten
-        int anfang = 0;
-        while (anfang < klartext.length()) {
-            int ende = anfang + blockLaenge;
+        LinkedList<char[]> charblocks = new LinkedList<>(); //LinkedList, um Reihenfolge beizubehalten
+        int start = 0;
+        while (start < plaintext.length()) {
+            int end = start + blockLength;
 
-            char[] block = Arrays.copyOfRange(chars, anfang, ende);
-            charbloecke.add(block);
+            char[] block = Arrays.copyOfRange(chars, start, end);
+            charblocks.add(block);
 
-            anfang = ende;
+            start = end;
         }
 
         System.out.println("\nKlartextblöcke: ");
-        for (char[] block : charbloecke)
+        for (char[] block : charblocks)
             Helper.prettyPrintCharArray(block);
 
         char textregister[] = Helper.byteArraytoCharArray(MessageDigest.getInstance("SHA-256").digest());
 
         System.out.println("\nTextregister:");
-        for (char[] block : charbloecke) {
+        for (char[] block : charblocks) {
 
             // Letzter Teil des Textregisters 128Bit
             //block XOR Textregister
             //letzter Teil des Textregisters extrahieren
 
 
-            char[] niederwertigeBytes = Arrays.copyOfRange(textregister, 16, 32);
+            char[] lastBytes = Arrays.copyOfRange(textregister, 16, 32);
 
             //e.
-            textregister = exor(niederwertigeBytes, block);
+            textregister = exor(lastBytes, block);
 
             //Mit Textregister wird ARC4 Initialisiert
             RC4 rc4 = new RC4(textregister);
@@ -55,27 +55,27 @@ public class Main {
 
             // Man lässt die nächsten 256Bytes verfallen
             for (int i = 0; i < 16; i++) {
-                rc4.berechneZufallsfolge(textregister);
+                rc4.calculate(textregister);
             }
 
-            char[] ergebnis1 = rc4.berechneZufallsfolge(textregister);
-            char[] ergebnis2 = rc4.berechneZufallsfolge(textregister);
+            char[] result1 = rc4.calculate(textregister);
+            char[] result2 = rc4.calculate(textregister);
 
-            textregister = new char[ergebnis1.length + ergebnis2.length];
-            System.arraycopy(ergebnis1, 0, textregister, 0, ergebnis1.length);
-            System.arraycopy(ergebnis2, 0, textregister, ergebnis2.length, ergebnis1.length);
+            textregister = new char[result1.length + result2.length];
+            System.arraycopy(result1, 0, textregister, 0, result1.length);
+            System.arraycopy(result2, 0, textregister, result2.length, result1.length);
 
 
             Helper.prettyPrintCharArray(textregister);
         }
 
-        String ergebnis = "";
+        StringBuilder result = new StringBuilder();
 
         for (char f : textregister) {
-            ergebnis = ergebnis + Integer.toHexString((int) f);
+            result.append(Integer.toHexString((int) f));
         }
 
-        System.out.println("\nErmittelter Hashwert:\n" + ergebnis);
+        System.out.println("\nErmittelter Hashwert:\n" + result);
 
 
     }

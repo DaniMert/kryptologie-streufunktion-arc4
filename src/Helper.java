@@ -2,31 +2,32 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.LinkedList;
 
 /**
- * Created by danielmertens on 10.01.18.
+ * Erstellt von Taubert, Pham, Mertens am 10.01.18.
+ * Stellt Hilfmethoden bereit.
  */
-public class Helper {
+class Helper {
 
-    static String plaintext = "Dies ist ein Test.";
-
-    public static void prettyPrintCharArray(char[] chars) {
-        String print = "[";
+    static void prettyPrintCharArray(char[] chars) {
+        StringBuilder print = new StringBuilder("[");
         for (char character : chars)
-            print = print + character + ", ";
-        print = print.substring(0, print.length() - 2) + "]";
+            print.append(character).append(", ");
+        print = new StringBuilder(print.substring(0, print.length() - 2) + "]");
 
         System.out.println(print);
     }
 
-    public static char[] byteArraytoCharArray(byte[] bytes) throws UnsupportedEncodingException {
+    static char[] byteArraytoCharArray(byte[] bytes) throws UnsupportedEncodingException {
 
         String text = new String(bytes, "UTF-8");
         return text.toCharArray();
     }
 
-    public static String getPlaintext(String[] path) {
+
+    static String getPlaintext(String[] path) {
+        String plaintext = "Dies ist ein Test.";
+
         if (path != null && path.length > 0) {
             try {
                 return new String(Files.readAllBytes(Paths.get(path[0])));
