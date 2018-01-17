@@ -50,9 +50,13 @@ class Helper {
         }
     }
 
-    //Konvertiere int zu Char-Array
-    static char[] intToCharArray(int value) {
+    //Konvertiere long (64 Bit Zahl) zu Char-Array
+    static char[] longToCharArray(long value) {
         return new char[] {
+                (char)((byte)(value >>> 56)& 0xFF),
+                (char)((byte)(value >>> 48)& 0xFF),
+                (char)((byte)(value >>> 40)& 0xFF),
+                (char)((byte)(value >>> 32)& 0xFF),
                 (char)((byte)(value >>> 24)& 0xFF),
                 (char)((byte)(value >>> 16)& 0xFF),
                 (char)((byte)(value >>> 8)& 0xFF),

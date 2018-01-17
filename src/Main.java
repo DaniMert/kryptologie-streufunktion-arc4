@@ -79,20 +79,23 @@ public class Main{
         //Anzahl der Bytes des Klartexts
         int plaintextcharslength = plaintextchars.length;
 
-        //Erstelle neues Char-Array, Länge = Vielfaches von 512Bits (64 Bytes)
-        int newLength = plaintextcharslength + (64 - (plaintextcharslength % 64));
-        char[] chars = Arrays.copyOf(plaintextchars, newLength);
+        //Erstelle neues Char-Array mit Länge modulo 512 Bits = 448Bits (56 Bytes)
+        int newLength = plaintextcharslength + (56 - (plaintextcharslength % 64));
+        char[] filledchars = Arrays.copyOf(plaintextchars, newLength);
 
-        //Setze Bit 1 hinter Klartext
-        chars[plaintextchars.length] = 0b10000000;
+        //Wenn mit Eins-Bit aufgefüllt werden muss
+        if(newLength != plaintextcharslength) {
+
+            //Setze Eins-Bit hinter Klartext
+            filledchars[plaintextchars.length] = 0b10000000;
+        }
 
         //Ermittle Länge des Klartexts in Bit
-        char[] plaintextlength = Helper.intToCharArray(plaintextcharslength * 8);
+        char[] plaintextlength = Helper.longToCharArray(plaintextcharslength * 8);
 
-        //Setze Länge des Klartexts als letzte Bytes
-        for(int i = 0; i < plaintextlength.length; i++){
-            chars[chars.length-1-i] = plaintextlength[plaintextlength.length-1-i];
-        }
+        //Hänge Länge des ursprünglichen Klartexts als letzte 8 Bytes (64 Bits) an
+        char[] chars = Arrays.copyOf(filledchars, filledchars.length + 8);
+        System.arraycopy(plaintextlength, 0, chars, filledchars.length, 8);
 
         //Zerlege Klartext in Blöcke zu je 128 Bits (16 Bytes)
         LinkedList<char[]> charblocks = new LinkedList<>(); //LinkedList, um Reihenfolge beizubehalten
