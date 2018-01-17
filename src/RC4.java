@@ -6,6 +6,7 @@ class RC4 {
 
     private char sbox[] = new char[256];
 
+    //Berechnung der initialien S-Box aus dem Schlüssel (Textregister) und dessen Länge
     RC4(char textregister[]) {
         for (int i = 0; i < 256; i++) {
             sbox[i] = (char) i;
@@ -18,6 +19,7 @@ class RC4 {
         }
     }
 
+    //Berechnung der Zufallsfolge
     char[] calculate(char textregister[]) {
         char randomResult[] = new char[textregister.length];
         int i = 0;
@@ -31,12 +33,12 @@ class RC4 {
 
             char randomValue = sbox[(sbox[i] + sbox[j]) % 256];
             randomResult[n] = (char) (randomValue ^ textregister[n]);
-
         }
 
         return randomResult;
     }
 
+    //Vertausche Werte in S-Box
     private void swapSboxValues(int i, int j) {
         char zs = sbox[i];
         sbox[i] = sbox[j];
