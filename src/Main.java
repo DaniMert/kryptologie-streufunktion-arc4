@@ -26,7 +26,7 @@ public class Main{
         char textregister[] = Helper.byteArraytoCharArray(MessageDigest.getInstance("SHA-256").digest());
 
         System.out.println("\nTextregister:");
-        System.out.print("Nach Initialisierung SHA-256: ");
+        System.out.print("Nach Initialisierung: ");
         Helper.prettyPrintCharArray(textregister);
 
         //Durchlaufe jeden Klartextblock (Teilaufgabe d.)
